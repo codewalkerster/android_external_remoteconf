@@ -12,6 +12,7 @@
 #define   REMOTE_IOC_SET_REPEAT_ENABLE		_IOW_BAD('I',8,sizeof(short))
 #define	REMOTE_IOC_SET_DEBUG_ENABLE			_IOW_BAD('I',9,sizeof(short)) 
 #define	REMOTE_IOC_SET_MODE					_IOW_BAD('I',10,sizeof(short)) 
+#define	REMOTE_IOC_SET_MOUSE_SPEED			_IOW_BAD('I',11,sizeof(short))
 
 #define   REMOTE_IOC_SET_RELEASE_DELAY		_IOW_BAD('I',99,sizeof(short))
 #define   REMOTE_IOC_SET_CUSTOMCODE   			_IOW_BAD('I',100,sizeof(short))
@@ -54,6 +55,7 @@ typedef   struct{
        unsigned int repeat_delay;
        unsigned int repeat_peroid;
        unsigned int work_mode ;
+       unsigned int mouse_speed;
 	unsigned int repeat_enable;
 	unsigned int factory_code;
 	unsigned int release_delay;
@@ -74,10 +76,11 @@ typedef   struct{
 }remote_config_t;
 
 //these string must in this order and sync with struct remote_config_t
-static char*  config_item[18]={
+static char*  config_item[19]={
     "repeat_delay",
     "repeat_peroid",
     "work_mode",
+    "mouse_speed",
     "repeat_enable",
     "factory_code",
     "release_delay",
@@ -97,10 +100,12 @@ static char*  config_item[18]={
     "reg_bit0_time"
 };
 
-static int remote_ioc_table[18]={
+static int remote_ioc_table[19]={
     REMOTE_IOC_SET_REPEAT_DELAY,
     REMOTE_IOC_SET_REPEAT_PERIOD,
     REMOTE_IOC_SET_MODE,
+    REMOTE_IOC_SET_MOUSE_SPEED,
+    
     REMOTE_IOC_SET_REPEAT_ENABLE,
     REMOTE_IOC_SET_CUSTOMCODE,
     REMOTE_IOC_SET_RELEASE_DELAY,
