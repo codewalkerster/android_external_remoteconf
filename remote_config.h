@@ -14,6 +14,7 @@
 #define	REMOTE_IOC_SET_MODE					_IOW_BAD('I',10,sizeof(short)) 
 #define	REMOTE_IOC_SET_MOUSE_SPEED			_IOW_BAD('I',11,sizeof(short))
 
+#define	REMOTE_IOC_SET_REPEAT_KEY_MAPPING       _IOW_BAD('I',20,sizeof(short))
 #define   REMOTE_IOC_SET_RELEASE_DELAY		_IOW_BAD('I',99,sizeof(short))
 #define   REMOTE_IOC_SET_CUSTOMCODE   			_IOW_BAD('I',100,sizeof(short))
 //reg
@@ -51,6 +52,7 @@
 
 typedef   struct{
        unsigned short *key_map;
+       unsigned short *repeat_key_map;
        unsigned short *mouse_map;
        unsigned int repeat_delay;
        unsigned int repeat_peroid;
