@@ -7,7 +7,7 @@
 
 #define DEVICE_NAME "/dev/amremote"
 
-unsigned short key_map[256], repeat_key_map[256], mouse_map[4];
+unsigned short key_map[256], mouse_map[4];
 
 unsigned short default_key_map[256] = {
 KEY_0, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, /*0~7*/
@@ -48,7 +48,7 @@ KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERV
 };
 
 unsigned short default_mouse_map[4] = {
- //0x10, 0x11, 0x0b, 0x0e
+ //0x10, 0x11, 0x0b, 0x0e 
  0xffff, 0xffff, 0xffff, 0xffff
 };
 
@@ -62,8 +62,6 @@ int main(int argc, char* argv[])
 
     for(i =0; i < 256; i++)
         key_map[i] = KEY_RESERVED;
-    for(i =0; i < 256; i++)
-        repeat_key_map[i] = KEY_RESERVED;
     for(i =0; i < 4; i++)
         mouse_map[i] = 0xffff;
     remote = (remote_config_t *)malloc(sizeof(remote_config_t));
@@ -73,7 +71,6 @@ int main(int argc, char* argv[])
         }
     memset((unsigned char*)remote, 0xff, sizeof(remote_config_t));
     remote->key_map = key_map;
-    remote->repeat_key_map = repeat_key_map;
     remote->mouse_map = mouse_map;
     device_fd = open(DEVICE_NAME, O_RDWR);
     if(device_fd < 0){
@@ -113,13 +110,6 @@ int main(int argc, char* argv[])
             val = (i<<16) | key_map[i];
             ioctl(device_fd, REMOTE_IOC_SET_KEY_MAPPING, &val);
             }
-
-    for(i = 0; i < 256; i++)
-        if(repeat_key_map[i] != KEY_RESERVED){
-            val = (i<<16) | repeat_key_map[i];
-            ioctl(device_fd, REMOTE_IOC_SET_REPEAT_KEY_MAPPING, &val);
-        }
-
     for(i = 0; i < 4; i++)
         if(mouse_map[i] != 0xffff){
             val = (i<<16) | mouse_map[i];

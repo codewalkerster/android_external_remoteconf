@@ -38,7 +38,6 @@ static int  remote_config_set(char *name,char *value,remote_config_t  *config)
 enum {
     CONFIG_LEVEL,
     KEYMAP_LEVEL,
-    REPEATKEYMAP_LEVEL,
     MOUSEMAP_LEVEL
 };
 int get_config_from_file(FILE *fp, remote_config_t *remote)
@@ -65,17 +64,10 @@ int get_config_from_file(FILE *fp, remote_config_t *remote)
                     parse_flag = KEYMAP_LEVEL;
                     continue;
                     }
-
-                if(strcasecmp(name, "repeat_key_begin")==0){
-                    parse_flag = REPEATKEYMAP_LEVEL;
-                    continue;
-                }
-
                 if(strcasecmp(name, "mouse_begin")==0){
                     parse_flag = MOUSEMAP_LEVEL;
                     continue;
                     }
-
                 value = strchr( line, '=' );
                 if (value) {
                     *value++ = 0;
@@ -106,27 +98,6 @@ int get_config_from_file(FILE *fp, remote_config_t *remote)
                 if(keycode)
                     remote->key_map[ircode] = keycode;
                 continue;
-            case REPEATKEYMAP_LEVEL :
-                if(strcasecmp(name, "repeat_key_end")==0){
-                    parse_flag = CONFIG_LEVEL;
-                    continue;
-                }
-                value = strchr( line, ' ' );
-                if (value) {
-                    *value++ = 0;
-                    str_trim( &value );
-                }
-                str_trim( &name );
-                if (!*name)
-                    continue;
-                ircode = strtoul(name, NULL, 0);
-                if(ircode > 0xff) continue;
-                keycode = strtoul(value, NULL, 0) & 0xffff;
-
-                if(keycode)
-                    remote->repeat_key_map[ircode] = keycode;
-                continue;
-
             case MOUSEMAP_LEVEL :
                 if(strcasecmp(name, "mouse_end")==0){
                     parse_flag = CONFIG_LEVEL;
