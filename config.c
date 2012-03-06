@@ -7,7 +7,7 @@
 int set_config(remote_config_t *remote, int device_fd)
 {
     unsigned int i;
-    unsigned int *para=(unsigned int*)remote + 2;
+    unsigned int *para=(unsigned int*)remote + 3;
 
     for(i = 0; i < ARRAY_SIZE(config_item); i++){
         if(para[i]!=0xffffffff){
@@ -17,14 +17,14 @@ int set_config(remote_config_t *remote, int device_fd)
                 case 8:
                 case 9:
                 case 10:
-                case 11:	
+                case 11:
                 case 12:
                 case 13:
                 case 14:
                 case 15:
                 case 16:
                 case 17:
-                    printf("%20s = 0x%x\n", config_item[i], para[i]);	
+                    printf("%20s = 0x%x\n", config_item[i], para[i]);
                     break;
                 default:
                     printf("%20s = %d\n", config_item[i], para[i]);
