@@ -47,6 +47,12 @@
 #define   REMOTE_IOC_GET_REG_FRAME_DATA		_IOR_BAD('I',127,sizeof(short))
 #define   REMOTE_IOC_GET_REG_FRAME_STATUS	_IOR_BAD('I',128,sizeof(short))
 
+#define   REMOTE_IOC_SET_FN_KEY_SCANCODE     _IOW_BAD('I', 131, sizeof(short)) 
+#define   REMOTE_IOC_SET_LEFT_KEY_SCANCODE   _IOW_BAD('I', 132, sizeof(short))
+#define   REMOTE_IOC_SET_RIGHT_KEY_SCANCODE  _IOW_BAD('I', 133, sizeof(short))
+#define   REMOTE_IOC_SET_UP_KEY_SCANCODE     _IOW_BAD('I', 134, sizeof(short))
+#define   REMOTE_IOC_SET_DOWN_KEY_SCANCODE   _IOW_BAD('I', 135, sizeof(short))
+#define   REMOTE_IOC_SET_OK_KEY_SCANCODE     _IOW_BAD('I', 136, sizeof(short))
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -75,10 +81,17 @@ typedef   struct{
 	unsigned int  reg_leader_idle;
 	unsigned int  reg_repeat_leader;
 	unsigned int  reg_bit0_time;
+
+	unsigned int fn_key_scancode;
+        unsigned int left_key_scancode;
+	unsigned int right_key_scancode;
+	unsigned int up_key_scancode;
+	unsigned int down_key_scancode;
+	unsigned int ok_key_scancode;
 }remote_config_t;
 
 //these string must in this order and sync with struct remote_config_t
-static char*  config_item[19]={
+static char*  config_item[25]={
     "repeat_delay",
     "repeat_peroid",
     "work_mode",
@@ -99,10 +112,17 @@ static char*  config_item[19]={
     "reg_leader_act",
     "reg_leader_idle",
     "reg_repeat_leader",
-    "reg_bit0_time"
+    "reg_bit0_time",
+
+    "fn_key_scancode",
+    "left_key_scancode",
+    "right_key_scancode",
+    "up_key_scancode",
+    "down_key_scancode",
+    "ok_key_scancode",
 };
 
-static int remote_ioc_table[19]={
+static int remote_ioc_table[25]={
     REMOTE_IOC_SET_REPEAT_DELAY,
     REMOTE_IOC_SET_REPEAT_PERIOD,
     REMOTE_IOC_SET_MODE,
@@ -124,7 +144,14 @@ static int remote_ioc_table[19]={
     REMOTE_IOC_SET_REG_LEADER_ACT,
     REMOTE_IOC_SET_REG_LEADER_IDLE,
     REMOTE_IOC_SET_REG_REPEAT_LEADER,
-    REMOTE_IOC_SET_REG_BIT0_TIME
+    REMOTE_IOC_SET_REG_BIT0_TIME,
+
+    REMOTE_IOC_SET_FN_KEY_SCANCODE,
+    REMOTE_IOC_SET_LEFT_KEY_SCANCODE,
+    REMOTE_IOC_SET_RIGHT_KEY_SCANCODE,
+    REMOTE_IOC_SET_UP_KEY_SCANCODE,
+    REMOTE_IOC_SET_DOWN_KEY_SCANCODE,
+    REMOTE_IOC_SET_OK_KEY_SCANCODE,
 };
 
 extern int set_config(remote_config_t *remote, int device_fd);
