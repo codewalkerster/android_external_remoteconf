@@ -3,35 +3,65 @@
 #include <string.h>
 #include "remote_config.h"
 
-static void str_trim( char **s )
-{
-     int i;
-     int len=strlen(*s) ;
+#define CC_MAX_LINE_LEN     (400)
 
-     for (i = len-1; i >= 0; i--)
-          if ((*s)[i] <= ' ')
-               (*s)[i] = 0;
-          else
-               break;
+static void str_trim(char **s) {
+    int i;
+    int len = strlen(*s);
 
-     while (**s)
-          if (**s <= ' ')
-               (*s)++;
-          else
-               return;
+    for (i = len - 1; i >= 0; i--) {
+        if ((*s)[i] <= ' ') {
+            (*s)[i] = 0;
+        } else {
+            break;
+        }
+    }
+
+    while (**s) {
+        if (**s <= ' ') {
+            (*s)++;
+        } else {
+            return;
+        }
+    }
 }
 
-static int  remote_config_set(char *name,char *value,remote_config_t  *config)
-{
-    unsigned int i;
-    unsigned int *config_para=(unsigned int*)config + 3;
+static void trim_line_data(char *line_data_buf) {
+    char *tmp_ptr = NULL;
 
-    for(i=0;i<ARRAY_SIZE(config_item);i++)
-        if(strcmp(config_item[i], name)==0){
-            config_para[i]=strtoul(value,NULL,0);
-            printf("curpara:%s  %08x\n",name, config_para[i]);
+    if (line_data_buf == NULL) {
+        return;
+    }
+
+    //trim comment string
+    tmp_ptr = line_data_buf;
+    while (*tmp_ptr && ((tmp_ptr - line_data_buf) <= CC_MAX_LINE_LEN)) {
+        if (*tmp_ptr == '#' || *tmp_ptr == ';') {
+            *tmp_ptr = '\0';
+            break;
+        }
+
+        tmp_ptr++;
+    }
+
+    //trim other character
+    tmp_ptr = line_data_buf;
+    str_trim(&tmp_ptr);
+    strncpy(line_data_buf, tmp_ptr, CC_MAX_LINE_LEN);
+}
+
+static int remote_config_set(char *name, char *value, remote_config_t *config) {
+    unsigned int i;
+    unsigned int *config_para = (unsigned int*) config + 3;
+
+    for (i = 0; i < ARRAY_SIZE(config_item); i++) {
+        if (strcmp(config_item[i], name) == 0) {
+            config_para[i] = strtoul(value, NULL, 0);
+            printf("curpara:%s  %08x\n", name, config_para[i]);
             return 0;
-            }
+        }
+    }
+
     return -1;
 }
 
@@ -41,111 +71,131 @@ enum {
     REPEATKEYMAP_LEVEL,
     MOUSEMAP_LEVEL
 };
-int get_config_from_file(FILE *fp, remote_config_t *remote)
-{
-    char  line[400];
+
+int get_config_from_file(FILE *fp, remote_config_t *remote) {
+    char line_data_buf[CC_MAX_LINE_LEN];
+    char *name = NULL;
+    char *value;
+    unsigned short ircode, keycode;
     unsigned char parse_flag = CONFIG_LEVEL;
 
-    while (fgets( line, 400, fp)) {
-        char *name = line;
-        char *comment = strchr((const char*) line,'#');
-        char *value;
-        unsigned short ircode, keycode;
+    while (fgets(line_data_buf, CC_MAX_LINE_LEN, fp)) {
+        trim_line_data(line_data_buf);
 
-        if (comment)
-             *comment = 0;
-        str_trim( &name );
+        name = line_data_buf;
 
-        if (*name == '#')
-            continue;
-
-        switch(parse_flag){
-            case CONFIG_LEVEL :
-
-                if(strcasecmp(name, "key_begin")==0){
-                    parse_flag = KEYMAP_LEVEL;
-                    continue;
-                    }
-
-                if(strcasecmp(name, "repeat_key_begin")==0){
-                    parse_flag = REPEATKEYMAP_LEVEL;
-                    continue;
-                }
-
-                if(strcasecmp(name, "mouse_begin")==0){
-                    parse_flag = MOUSEMAP_LEVEL;
-                    continue;
-                    }
-
-                value = strchr( line, '=' );
-                if (value) {
-                    *value++ = 0;
-                    str_trim( &value );
-                    }
-                str_trim( &name );
-                if (!*name)
-                    continue;
-                if(remote_config_set( name, value, remote ))
-                    printf("config file has not supported parameter:%s=%s\r\n",name,value);
-                continue;
-            case KEYMAP_LEVEL :
-                if(strcasecmp(name, "key_end")==0){
-                    parse_flag = CONFIG_LEVEL;
-                    continue;
-                    }
-                value = strchr( line, ' ' );
-                if (value) {
-                    *value++ = 0;
-                    str_trim( &value );
-                    }
-                str_trim( &name );
-                if (!*name)
-                    continue;
-                ircode = strtoul(name, NULL, 0);
-                if(ircode > 0xff) continue;
-                keycode = strtoul(value, NULL, 0) & 0xffff;
-                if(keycode)
-                    remote->key_map[ircode] = keycode;
-                continue;
-            case REPEATKEYMAP_LEVEL :
-                if(strcasecmp(name, "repeat_key_end")==0){
-                    parse_flag = CONFIG_LEVEL;
-                    continue;
-                }
-                value = strchr( line, ' ' );
-                if (value) {
-                    *value++ = 0;
-                    str_trim( &value );
-                }
-                str_trim( &name );
-                if (!*name)
-                    continue;
-                ircode = strtoul(name, NULL, 0);
-                if(ircode > 0xff) continue;
-                keycode = strtoul(value, NULL, 0) & 0xffff;
-
-                if(keycode)
-                    remote->repeat_key_map[ircode] = keycode;
-                continue;
-
-            case MOUSEMAP_LEVEL :
-                if(strcasecmp(name, "mouse_end")==0){
-                    parse_flag = CONFIG_LEVEL;
-                    continue;
-                    }
-                value = strchr( line, ' ' );
-                if (value) {
-                    *value++ = 0;
-                    str_trim( &value );
-                    }
-                str_trim( &name );
-                if (!*name)
-                    continue;
-                ircode = strtoul(name, NULL, 0);
-                if(ircode > 3) continue;
-                remote->mouse_map[ircode] = strtoul(value, NULL, 0) & 0xff;
+        switch (parse_flag) {
+        case CONFIG_LEVEL:
+            if (strcasecmp(name, "key_begin") == 0) {
+                parse_flag = KEYMAP_LEVEL;
                 continue;
             }
+
+            if (strcasecmp(name, "repeat_key_begin") == 0) {
+                parse_flag = REPEATKEYMAP_LEVEL;
+                continue;
+            }
+
+            if (strcasecmp(name, "mouse_begin") == 0) {
+                parse_flag = MOUSEMAP_LEVEL;
+                continue;
+            }
+
+            value = strchr(line_data_buf, '=');
+            if (value) {
+                *value++ = 0;
+                str_trim(&value);
+            }
+
+            str_trim(&name);
+            if (!*name) {
+                continue;
+            }
+
+            if (remote_config_set(name, value, remote)) {
+                printf("config file has not supported parameter:%s=%s\r\n", name, value);
+            }
+            continue;
+        case KEYMAP_LEVEL:
+            if (strcasecmp(name, "key_end") == 0) {
+                parse_flag = CONFIG_LEVEL;
+                continue;
+            }
+
+            value = strchr(line_data_buf, ' ');
+            if (value) {
+                *value++ = 0;
+                str_trim(&value);
+            }
+
+            str_trim(&name);
+            if (!*name) {
+                continue;
+            }
+            ircode = strtoul(name, NULL, 0);
+            if (ircode > 0xff) {
+                continue;
+            }
+
+            keycode = strtoul(value, NULL, 0) & 0xffff;
+            if (keycode) {
+                remote->key_map[ircode] = keycode;
+                printf("KEYMAP_LEVEL: ircode = 0x%x, keycode = %d\n", ircode, keycode);
+            }
+            continue;
+        case REPEATKEYMAP_LEVEL:
+            if (strcasecmp(name, "repeat_key_end") == 0) {
+                parse_flag = CONFIG_LEVEL;
+                continue;
+            }
+
+            value = strchr(line_data_buf, ' ');
+            if (value) {
+                *value++ = 0;
+                str_trim(&value);
+            }
+
+            str_trim(&name);
+            if (!*name) {
+                continue;
+            }
+            ircode = strtoul(name, NULL, 0);
+            if (ircode > 0xff) {
+                continue;
+            }
+
+            keycode = strtoul(value, NULL, 0) & 0xffff;
+            if (keycode) {
+                remote->repeat_key_map[ircode] = keycode;
+                printf("REPEATKEYMAP_LEVEL: ircode = 0x%x, keycode = %d\n", ircode, keycode);
+            }
+            continue;
+        case MOUSEMAP_LEVEL:
+            if (strcasecmp(name, "mouse_end") == 0) {
+                parse_flag = CONFIG_LEVEL;
+                continue;
+            }
+
+            value = strchr(line_data_buf, ' ');
+            if (value) {
+                *value++ = 0;
+                str_trim(&value);
+            }
+
+            str_trim(&name);
+            if (!*name) {
+                continue;
+            }
+            ircode = strtoul(name, NULL, 0);
+            if (ircode > 3) {
+                continue;
+            }
+
+            keycode = strtoul(value, NULL, 0) & 0xff;
+            remote->mouse_map[ircode] = keycode;
+            printf("MOUSEMAP_LEVEL: ircode = 0x%x, keycode = %d\n", ircode, keycode);
+            continue;
         }
+    }
     return 0;
 }
