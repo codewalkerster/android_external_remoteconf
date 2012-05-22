@@ -2,7 +2,8 @@
 #define  _REMOTE_CONFIG_H
 
 #include <asm/ioctl.h>
-
+#define   REMOTE_IOC_UNFCODE_CONFIG              _IOW_BAD('I',12,sizeof(short))
+#define   REMOTE_IOC_INFCODE_CONFIG              _IOW_BAD('I',13,sizeof(short))
 #define   REMOTE_IOC_RESET_KEY_MAPPING	    _IOW_BAD('I',3,sizeof(short))
 #define   REMOTE_IOC_SET_KEY_MAPPING		    _IOW_BAD('I',4,sizeof(short))
 #define   REMOTE_IOC_SET_MOUSE_MAPPING	    _IOW_BAD('I',5,sizeof(short))
@@ -65,6 +66,8 @@ typedef   struct{
        unsigned int work_mode ;
        unsigned int mouse_speed;
 	unsigned int repeat_enable;
+	unsigned int factory_infcode;
+	unsigned int factory_unfcode;
 	unsigned int factory_code;
 	unsigned int release_delay;
 	unsigned int debug_enable;
@@ -91,12 +94,14 @@ typedef   struct{
 }remote_config_t;
 
 //these string must in this order and sync with struct remote_config_t
-static char*  config_item[25]={
+static char*  config_item[27]={
     "repeat_delay",
     "repeat_peroid",
     "work_mode",
     "mouse_speed",
     "repeat_enable",
+    "factory_infcode",
+    "factory_unfcode",
     "factory_code",
     "release_delay",
     "debug_enable",
@@ -122,13 +127,15 @@ static char*  config_item[25]={
     "ok_key_scancode",
 };
 
-static int remote_ioc_table[25]={
+static int remote_ioc_table[27]={
     REMOTE_IOC_SET_REPEAT_DELAY,
     REMOTE_IOC_SET_REPEAT_PERIOD,
     REMOTE_IOC_SET_MODE,
     REMOTE_IOC_SET_MOUSE_SPEED,
     
     REMOTE_IOC_SET_REPEAT_ENABLE,
+    REMOTE_IOC_INFCODE_CONFIG,      
+    REMOTE_IOC_UNFCODE_CONFIG,
     REMOTE_IOC_SET_CUSTOMCODE,
     REMOTE_IOC_SET_RELEASE_DELAY,
     REMOTE_IOC_SET_DEBUG_ENABLE,
