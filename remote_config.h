@@ -54,6 +54,8 @@
 #define   REMOTE_IOC_SET_UP_KEY_SCANCODE     _IOW_BAD('I', 134, sizeof(short))
 #define   REMOTE_IOC_SET_DOWN_KEY_SCANCODE   _IOW_BAD('I', 135, sizeof(short))
 #define   REMOTE_IOC_SET_OK_KEY_SCANCODE     _IOW_BAD('I', 136, sizeof(short))
+#define   REMOTE_IOC_SET_PAGEUP_KEY_SCANCODE _IOW_BAD('I', 137, sizeof(short))
+#define   REMOTE_IOC_SET_PAGEDOWN_KEY_SCANCODE _IOW_BAD('I', 138, sizeof(short))
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -91,10 +93,12 @@ typedef   struct{
 	unsigned int up_key_scancode;
 	unsigned int down_key_scancode;
 	unsigned int ok_key_scancode;
+	unsigned int pageup_key_scancode;
+	unsigned int pagedown_key_scancode;
 }remote_config_t;
 
 //these string must in this order and sync with struct remote_config_t
-static char*  config_item[27]={
+static char*  config_item[29]={
     "repeat_delay",
     "repeat_peroid",
     "work_mode",
@@ -125,9 +129,11 @@ static char*  config_item[27]={
     "up_key_scancode",
     "down_key_scancode",
     "ok_key_scancode",
+    "pageup_key_scancode",
+    "pagedown_key_scancode",
 };
 
-static int remote_ioc_table[27]={
+static int remote_ioc_table[29]={
     REMOTE_IOC_SET_REPEAT_DELAY,
     REMOTE_IOC_SET_REPEAT_PERIOD,
     REMOTE_IOC_SET_MODE,
@@ -159,6 +165,8 @@ static int remote_ioc_table[27]={
     REMOTE_IOC_SET_UP_KEY_SCANCODE,
     REMOTE_IOC_SET_DOWN_KEY_SCANCODE,
     REMOTE_IOC_SET_OK_KEY_SCANCODE,
+    REMOTE_IOC_SET_PAGEUP_KEY_SCANCODE,
+    REMOTE_IOC_SET_PAGEDOWN_KEY_SCANCODE,
 };
 
 extern int set_config(remote_config_t *remote, int device_fd);
