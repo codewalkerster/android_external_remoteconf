@@ -57,6 +57,10 @@
 #define   REMOTE_IOC_SET_PAGEUP_KEY_SCANCODE _IOW_BAD('I', 137, sizeof(short))
 #define   REMOTE_IOC_SET_PAGEDOWN_KEY_SCANCODE _IOW_BAD('I', 138, sizeof(short))
 
+#define   ADC_KP_MAGIC 'P'
+#define   KEY_IOC_SET_MOVE_MAP        		_IOW_BAD(ADC_KP_MAGIC,0X02,int)
+#define   KEY_IOC_SET_MOVE_ENABLE		  	_IOW_BAD(ADC_KP_MAGIC,0X03,int)
+
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 typedef   struct{

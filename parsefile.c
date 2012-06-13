@@ -69,14 +69,18 @@ enum {
     CONFIG_LEVEL,
     KEYMAP_LEVEL,
     REPEATKEYMAP_LEVEL,
-    MOUSEMAP_LEVEL
+    MOUSEMAP_LEVEL,
+    ADCMAP_LEVEL
 };
+
+extern unsigned short adc_map[2];
+extern unsigned int adc_move_enable;
 
 int get_config_from_file(FILE *fp, remote_config_t *remote) {
     char line_data_buf[CC_MAX_LINE_LEN];
     char *name = NULL;
     char *value;
-    unsigned short ircode, keycode;
+    unsigned short ircode, keycode,adccode;
     unsigned char parse_flag = CONFIG_LEVEL;
 
     while (fgets(line_data_buf, CC_MAX_LINE_LEN, fp)) {
@@ -98,6 +102,10 @@ int get_config_from_file(FILE *fp, remote_config_t *remote) {
 
             if (strcasecmp(name, "mouse_begin") == 0) {
                 parse_flag = MOUSEMAP_LEVEL;
+                continue;
+            }
+		    if (strcasecmp(name, "keyadc_begin") == 0) {
+                parse_flag = ADCMAP_LEVEL;
                 continue;
             }
 
@@ -194,6 +202,34 @@ int get_config_from_file(FILE *fp, remote_config_t *remote) {
             keycode = strtoul(value, NULL, 0) & 0xff;
             remote->mouse_map[ircode] = keycode;
             printf("MOUSEMAP_LEVEL: ircode = 0x%x, keycode = %d\n", ircode, keycode);
+            continue;
+        case ADCMAP_LEVEL:
+            if (strcasecmp(name, "keyadc_end") == 0) {
+                parse_flag = CONFIG_LEVEL;
+                continue;
+            }
+
+            value = strchr(line_data_buf, ' ');
+            if (value) {
+                *value++ = 0;
+                str_trim(&value);
+            }
+
+            str_trim(&name);
+            if (!*name) {
+                continue;
+            }
+
+            adccode = strtoul(name, NULL, 0);
+            if (adccode > 3) {
+                continue;
+            }
+            if (adc_move_enable == 0) {
+                adc_move_enable = 1;
+            }
+
+            keycode = strtoul(value, NULL, 0) & 0xff;
+            adc_map[adccode] = keycode;
             continue;
         }
     }

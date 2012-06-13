@@ -6,6 +6,7 @@
 #include "keydefine.h"
 
 #define DEVICE_NAME "/dev/amremote"
+#define DEVICE_KP  "/dev/am_adc_kpd"
 
 unsigned short key_map[256], repeat_key_map[256], mouse_map[4];
 
@@ -51,6 +52,11 @@ unsigned short default_mouse_map[4] = {
  //0x10, 0x11, 0x0b, 0x0e 
  0xffff, 0xffff, 0xffff, 0xffff
 };
+
+unsigned short adc_map[2] ={0xffff, 0xffff};//left,right
+unsigned int adc_move_enable = 0;
+
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 int main(int argc, char* argv[])
 {
@@ -126,5 +132,24 @@ int main(int argc, char* argv[])
             ioctl(device_fd, REMOTE_IOC_SET_MOUSE_MAPPING, &val);
             }
     close(device_fd);
+    
+    device_fd = open(DEVICE_KP, O_RDWR);
+    if (device_fd >= 0) {
+        if (adc_move_enable != 0) {
+            for (i = 0; i < ARRAY_SIZE(adc_map); i++) {
+                if (adc_map[i] != 0xffff) {
+                    val = (i << 16) | adc_map[i];
+                    ioctl(device_fd, KEY_IOC_SET_MOVE_MAP, &val);
+                    printf("adc_map[%d] = %d ,val = %d \n", i, adc_map[i], val);
+                }
+            }
+        }
+
+        ioctl(device_fd, KEY_IOC_SET_MOVE_ENABLE, &adc_move_enable);
+        printf("adc_move_enable = %d \n", adc_move_enable);
+
+        close(device_fd);
+    }
+
     return 0;
 }
