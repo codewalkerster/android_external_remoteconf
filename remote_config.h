@@ -57,6 +57,9 @@
 #define   REMOTE_IOC_SET_PAGEUP_KEY_SCANCODE _IOW_BAD('I', 137, sizeof(short))
 #define   REMOTE_IOC_SET_PAGEDOWN_KEY_SCANCODE _IOW_BAD('I', 138, sizeof(short))
 
+#define   REMOTE_IOC_SET_TW_BIT2_TIME			_IOW_BAD('I',129,sizeof(short))
+#define   REMOTE_IOC_SET_TW_BIT3_TIME			_IOW_BAD('I',130,sizeof(short))
+
 #define   ADC_KP_MAGIC 'P'
 #define   KEY_IOC_SET_MOVE_MAP        		_IOW_BAD(ADC_KP_MAGIC,0X02,int)
 #define   KEY_IOC_SET_MOVE_ENABLE		  	_IOW_BAD(ADC_KP_MAGIC,0X03,int)
@@ -82,6 +85,8 @@ typedef   struct{
 	unsigned int 	tw_leader_act;
 	unsigned int 	tw_bit0;
 	unsigned int   tw_bit1;
+	unsigned int   tw_bit2;
+	unsigned int   tw_bit3;
 	unsigned int 	tw_repeat_leader;
 //reg
 	unsigned int  reg_base_gen;
@@ -102,7 +107,7 @@ typedef   struct{
 }remote_config_t;
 
 //these string must in this order and sync with struct remote_config_t
-static char*  config_item[29]={
+static char*  config_item[31]={
     "repeat_delay",
     "repeat_peroid",
     "work_mode",
@@ -118,6 +123,8 @@ static char*  config_item[29]={
     "tw_leader_act",
     "tw_bit0",
     "tw_bit1",
+    "tw_bit2",
+    "tw_bit3",
     "tw_repeat_leader",
 //reg
     "reg_base_gen",
@@ -137,7 +144,7 @@ static char*  config_item[29]={
     "pagedown_key_scancode",
 };
 
-static int remote_ioc_table[29]={
+static int remote_ioc_table[31]={
     REMOTE_IOC_SET_REPEAT_DELAY,
     REMOTE_IOC_SET_REPEAT_PERIOD,
     REMOTE_IOC_SET_MODE,
@@ -154,6 +161,8 @@ static int remote_ioc_table[29]={
     REMOTE_IOC_SET_TW_LEADER_ACT,
     REMOTE_IOC_SET_TW_BIT0_TIME,
     REMOTE_IOC_SET_TW_BIT1_TIME,
+    REMOTE_IOC_SET_TW_BIT2_TIME,
+    REMOTE_IOC_SET_TW_BIT3_TIME,
     REMOTE_IOC_SET_TW_REPEATE_LEADER,
 //reg
     REMOTE_IOC_SET_REG_BASE_GEN,
