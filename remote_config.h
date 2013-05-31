@@ -16,6 +16,8 @@
 #define	REMOTE_IOC_SET_MOUSE_SPEED			_IOW_BAD('I',11,sizeof(short))
 
 #define	REMOTE_IOC_SET_REPEAT_KEY_MAPPING       _IOW_BAD('I',20,sizeof(short))
+#define   REMOTE_IOC_SET_RELEASE_FDELAY		_IOW_BAD('I',97,sizeof(short))
+#define   REMOTE_IOC_SET_RELEASE_SDELAY		_IOW_BAD('I',98,sizeof(short))
 #define   REMOTE_IOC_SET_RELEASE_DELAY		_IOW_BAD('I',99,sizeof(short))
 #define   REMOTE_IOC_SET_CUSTOMCODE   			_IOW_BAD('I',100,sizeof(short))
 //reg
@@ -79,6 +81,8 @@ typedef   struct{
 	unsigned int factory_unfcode;
 	unsigned int factory_code;
 	unsigned int release_delay;
+	unsigned int release_fdelay;
+	unsigned int release_sdelay;
 	unsigned int debug_enable;
 //sw
 	unsigned int 	bit_count;
@@ -107,7 +111,7 @@ typedef   struct{
 }remote_config_t;
 
 //these string must in this order and sync with struct remote_config_t
-static char*  config_item[31]={
+static char*  config_item[33]={
     "repeat_delay",
     "repeat_peroid",
     "work_mode",
@@ -117,6 +121,8 @@ static char*  config_item[31]={
     "factory_unfcode",
     "factory_code",
     "release_delay",
+    "release_fdelay",
+    "release_sdelay",
     "debug_enable",
 //sw
     "bit_count",
@@ -144,7 +150,7 @@ static char*  config_item[31]={
     "pagedown_key_scancode",
 };
 
-static int remote_ioc_table[31]={
+static int remote_ioc_table[33]={
     REMOTE_IOC_SET_REPEAT_DELAY,
     REMOTE_IOC_SET_REPEAT_PERIOD,
     REMOTE_IOC_SET_MODE,
@@ -155,6 +161,8 @@ static int remote_ioc_table[31]={
     REMOTE_IOC_UNFCODE_CONFIG,
     REMOTE_IOC_SET_CUSTOMCODE,
     REMOTE_IOC_SET_RELEASE_DELAY,
+    REMOTE_IOC_SET_RELEASE_FDELAY,
+    REMOTE_IOC_SET_RELEASE_SDELAY,
     REMOTE_IOC_SET_DEBUG_ENABLE,
 //sw
     REMOTE_IOC_SET_BIT_COUNT,
