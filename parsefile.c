@@ -52,7 +52,7 @@ static void trim_line_data(char *line_data_buf) {
 
 static int remote_config_set(char *name, char *value, remote_config_t *config) {
     unsigned int i;
-    unsigned int *config_para = (unsigned int*) config + 3;
+    unsigned int *config_para = (unsigned int*) config + 4;
 
     for (i = 0; i < ARRAY_SIZE(config_item); i++) {
         if (strcmp(config_item[i], name) == 0) {
@@ -70,7 +70,8 @@ enum {
     KEYMAP_LEVEL,
     REPEATKEYMAP_LEVEL,
     MOUSEMAP_LEVEL,
-    ADCMAP_LEVEL
+    ADCMAP_LEVEL,
+	FACTORYCUSTMAP_LEVEL
 };
 
 extern unsigned short adc_map[2];
@@ -80,7 +81,7 @@ int get_config_from_file(FILE *fp, remote_config_t *remote) {
     char line_data_buf[CC_MAX_LINE_LEN];
     char *name = NULL;
     char *value;
-    unsigned short ircode, keycode,adccode;
+    unsigned short ircode, keycode,adccode,index,custcode;
     unsigned char parse_flag = CONFIG_LEVEL;
 
     while (fgets(line_data_buf, CC_MAX_LINE_LEN, fp)) {
@@ -108,7 +109,10 @@ int get_config_from_file(FILE *fp, remote_config_t *remote) {
                 parse_flag = ADCMAP_LEVEL;
                 continue;
             }
-
+		    if (strcasecmp(name, "factorycust_begin") == 0) {
+                parse_flag = FACTORYCUSTMAP_LEVEL;
+                continue;
+			}
             value = strchr(line_data_buf, '=');
             if (value) {
                 *value++ = 0;
@@ -230,6 +234,33 @@ int get_config_from_file(FILE *fp, remote_config_t *remote) {
 
             keycode = strtoul(value, NULL, 0) & 0xff;
             adc_map[adccode] = keycode;
+            continue;
+		case FACTORYCUSTMAP_LEVEL:
+            if (strcasecmp(name, "factorycust_end") == 0) {
+                parse_flag = CONFIG_LEVEL;
+                continue;
+            }
+
+            value = strchr(line_data_buf, ' ');
+            if (value) {
+                *value++ = 0;
+                str_trim(&value);
+            }
+
+            str_trim(&name);
+            if (!*name) {
+                continue;
+            }
+            index = strtoul(name, NULL, 0);
+            if (ircode > 0xff) {
+                continue;
+            }
+
+            custcode = strtoul(value, NULL, 0) & 0xffff;
+            if (keycode) {
+                remote->factory_customercode_map[index] = custcode;
+                printf("FACTORYCUSTMAP_LEVEL: index = 0x%x, custcode = 0x%x\n", index, custcode);
+            }
             continue;
         }
     }

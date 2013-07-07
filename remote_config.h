@@ -61,7 +61,7 @@
 
 #define   REMOTE_IOC_SET_TW_BIT2_TIME			_IOW_BAD('I',129,sizeof(short))
 #define   REMOTE_IOC_SET_TW_BIT3_TIME			_IOW_BAD('I',130,sizeof(short))
-
+#define   REMOTE_IOC_SET_FACTORY_CUSTOMCODE     _IOW_BAD('I',139,sizeof(short))
 #define   ADC_KP_MAGIC 'P'
 #define   KEY_IOC_SET_MOVE_MAP        		_IOW_BAD(ADC_KP_MAGIC,0X02,int)
 #define   KEY_IOC_SET_MOVE_ENABLE		  	_IOW_BAD(ADC_KP_MAGIC,0X03,int)
@@ -72,6 +72,7 @@ typedef   struct{
        unsigned short *key_map;
        unsigned short *repeat_key_map;
        unsigned short *mouse_map;
+	   unsigned int *factory_customercode_map;
        unsigned int repeat_delay;
        unsigned int repeat_peroid;
        unsigned int work_mode ;

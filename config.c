@@ -7,7 +7,7 @@
 int set_config(remote_config_t *remote, int device_fd)
 {
     unsigned int i;
-    unsigned int *para=(unsigned int*)remote + 3;
+    unsigned int *para=(unsigned int*)remote + 4;
 
     for(i = 0; i < ARRAY_SIZE(config_item); i++){
         if(para[i]!=0xffffffff){
